@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import NotificationBell from './NotificationBell';
 import {
   LayoutDashboard,
   CheckSquare,
@@ -11,16 +12,12 @@ import {
   Bell,
   LogOut,
   User,
-  GraduationCap,
-  Image,
-  Upload,
-  Database
+  GraduationCap  // ADD THIS
 } from 'lucide-react';
 
 function Sidebar() {
-  const { currentUser, logout, isAdmin, userRole } = useAuth();
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  const isHR = userRole === 'hr';
 
   const handleLogout = async () => {
     try {
@@ -31,26 +28,17 @@ function Sidebar() {
     }
   };
 
-  /** -------------------------
-   *  MERGED ROLE-BASED MENU
-   *  ------------------------- */
-  const menuItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard', roles: ['employee', 'hr', 'admin'] },
-    { path: '/photos', icon: Image, label: 'Photos', roles: ['employee', 'hr', 'admin'] },
-    { path: '/file-upload', icon: Upload, label: 'Upload Files', roles: ['employee', 'hr', 'admin'] },
-    { path: '/tasks', icon: CheckSquare, label: 'Tasks', roles: ['employee', 'hr', 'admin'] },
-    { path: '/timesheets', icon: Clock, label: 'Timesheets', roles: ['employee', 'hr', 'admin'] },
-    { path: '/training', icon: Calendar, label: 'Training', roles: ['employee', 'hr', 'admin'] },
-    { path: '/celebrations', icon: Cake, label: 'Celebrations', roles: ['employee', 'hr', 'admin'] },
-    { path: '/sops', icon: FileText, label: 'SOPs & Policies', roles: ['employee', 'hr', 'admin'] },
-    { path: '/kudos', icon: Award, label: 'Kudos', roles: ['employee', 'hr', 'admin'] },
-    { path: '/learning', icon: GraduationCap, label: 'Learning Hub', roles: ['employee', 'hr', 'admin'] },
-    { path: '/announcements', icon: Bell, label: 'Announcements', roles: ['employee', 'hr', 'admin'] },
-    { path: '/timesheet-link', icon: Clock, label: 'My Timesheet', roles: ['employee', 'hr', 'admin'] },
-    { path: '/profile', icon: User, label: 'Profile', roles: ['employee', 'hr', 'admin'] }
-  ];
-
-  const filteredMenu = menuItems.filter(item => item.roles.includes(userRole));
+ const menuItems = [
+  { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
+  { path: '/timesheets', icon: Clock, label: 'Timesheets' },
+  { path: '/training', icon: Calendar, label: 'Training' },
+  { path: '/celebrations', icon: Cake, label: 'Celebrations' },
+  { path: '/sops', icon: FileText, label: 'SOPs & Policies' },
+  { path: '/kudos', icon: Award, label: 'Kudos' },
+  { path: '/learning', icon: GraduationCap, label: 'Learning Hub' },
+  { path: '/announcements', icon: Bell, label: 'Announcements' },
+];
 
   return (
     <div style={styles.sidebar}>
@@ -63,53 +51,51 @@ function Sidebar() {
         <div style={styles.avatar}>
           <User size={20} />
         </div>
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={styles.userName}>{currentUser?.email?.split('@')[0]}</div>
           <div style={styles.userEmail}>{currentUser?.email}</div>
+        </div>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <NotificationBell />
+          <button
+            onClick={() => {
+              document.body.classList.toggle('dark-mode');
+            }}
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
+              border: 'none',
+              background: 'rgba(255, 255, 255, 0.1)',
+              color: 'white',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.3s',
+            }}
+            title="Toggle Dark Mode"
+          >
+            🌙
+          </button>
         </div>
       </div>
 
       <nav style={styles.nav}>
-        {filteredMenu.map((item) => {
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              end={item.path === '/'}
-              style={({ isActive }) => ({
-                ...styles.navLink,
-                ...(isActive ? styles.navLinkActive : {})
-              })}
-              onMouseEnter={(e) => {
-                if (!e.currentTarget.classList.contains('active')) {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!e.currentTarget.classList.contains('active')) {
-                  e.currentTarget.style.background = 'transparent';
-                }
-              }}
-            >
-              <Icon size={20} />
-              <span>{item.label}</span>
-            </NavLink>
-          );
-        })}
-
-        {(isAdmin || isHR) && (
+        {menuItems.map((item) => (
           <NavLink
-            to="/csv-import"
+            key={item.path}
+            to={item.path}
+            end={item.path === '/'}
             style={({ isActive }) => ({
               ...styles.navLink,
               ...(isActive ? styles.navLinkActive : {})
             })}
           >
-            <Upload size={20} />
-            <span>CSV Import</span>
+            <item.icon size={20} />
+            <span>{item.label}</span>
           </NavLink>
-        )}
+        ))}
       </nav>
 
       <button onClick={handleLogout} style={styles.logoutBtn}>
@@ -194,13 +180,11 @@ const styles = {
     fontSize: '14px',
     fontWeight: '500',
     transition: 'all 0.2s',
-    opacity: 0.85,
-    borderLeft: '4px solid transparent'
+    opacity: 0.8,
   },
   navLinkActive: {
     background: 'rgba(255, 255, 255, 0.2)',
     opacity: 1,
-    borderLeft: '4px solid white'
   },
   logoutBtn: {
     display: 'flex',

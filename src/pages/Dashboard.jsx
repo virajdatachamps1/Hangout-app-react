@@ -1,6 +1,20 @@
 import { CheckSquare, Users, Calendar, Award } from 'lucide-react';
-
+import { useState, useEffect } from 'react';
+import LiveActivityFeed from '../components/LiveActivityFeed';
+import CelebrationCountdown from '../components/CelebrationCountdown';
 function Dashboard() {
+  const [loading] = useState(false);
+  
+  // Mock data for demonstration
+  const upcomingCelebrations = {
+    birthdays: [
+      { name: 'Sarah Johnson', department: 'Marketing', upcomingDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) },
+      { name: 'Mike Chen', department: 'Engineering', upcomingDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) }
+    ],
+    anniversaries: [
+      { name: 'Emma Wilson', department: 'Design', upcomingDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) }
+    ]
+  };
   const stats = [
     { icon: CheckSquare, label: 'Pending Tasks', value: '12', color: 'blue' },
     { icon: Users, label: 'Team Members', value: '24', color: 'green' },
@@ -47,24 +61,59 @@ function Dashboard() {
       </div>
 
       <div className="dashboard-grid">
+        {/* Live Activity Feed */}
+        <div style={{ gridColumn: 'span 1' }}>
+          <LiveActivityFeed />
+        </div>
+
+        {/* Upcoming Celebrations with Countdowns */}
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">
               <Calendar size={20} />
-              Upcoming Birthdays
+              This Week's Celebrations
             </h3>
             <span className="card-action">View All</span>
           </div>
-          {upcomingBirthdays.map((birthday, index) => (
-            <div key={index} className="list-item">
-              <div className="avatar">{birthday.name.charAt(0)}</div>
-              <div className="list-content">
-                <div className="list-title">{birthday.name}</div>
-                <div className="list-subtitle">{birthday.date}</div>
-              </div>
-              <span className="badge success">🎂</span>
+          
+          {loading ? (
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <div className="spinner-fancy" style={{ margin: '0 auto' }} />
             </div>
-          ))}
+          ) : (
+            <>
+              {upcomingCelebrations.birthdays.slice(0, 2).map((birthday, index) => (
+                <div key={index} style={{ marginBottom: '16px' }}>
+                  <CelebrationCountdown
+                    name={birthday.name}
+                    type="birthday"
+                    date={birthday.upcomingDate}
+                    department={birthday.department}
+                    onRemind={() => console.log('Remind me:', birthday.name)}
+                  />
+                </div>
+              ))}
+              
+              {upcomingCelebrations.anniversaries.slice(0, 1).map((anniversary, index) => (
+                <div key={`anniv-${index}`} style={{ marginBottom: '16px' }}>
+                  <CelebrationCountdown
+                    name={anniversary.name}
+                    type="anniversary"
+                    date={anniversary.upcomingDate}
+                    department={anniversary.department}
+                    onRemind={() => console.log('Remind me:', anniversary.name)}
+                  />
+                </div>
+              ))}
+              
+              {upcomingCelebrations.birthdays.length === 0 && upcomingCelebrations.anniversaries.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#999' }}>
+                  <Calendar size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
+                  <p>No upcoming celebrations this week</p>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         <div className="card">

@@ -1,0 +1,517 @@
+/* ============================================
+   DARK MODE THEME
+   Complete dark mode with glassmorphism support
+   ============================================ */
+
+/* Root CSS Variables - Light Mode (Default) */
+:root {
+  /* Colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --border-color: #e5e7eb;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --shadow-lg: rgba(0, 0, 0, 0.15);
+  
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: rgba(0, 0, 0, 0.1);
+  
+  /* Card Backgrounds */
+  --card-bg: #ffffff;
+  --card-hover: #f9fafb;
+  
+  /* Input Backgrounds */
+  --input-bg: #ffffff;
+  --input-border: #e5e7eb;
+  --input-focus: #4f46e5;
+  
+  /* Sidebar */
+  --sidebar-bg: linear-gradient(180deg, #4f46e5 0%, #6366f1 100%);
+  --sidebar-text: #ffffff;
+  --sidebar-active: rgba(255, 255, 255, 0.2);
+  
+  /* Status Colors */
+  --success-bg: #d1fae5;
+  --success-text: #059669;
+  --warning-bg: #fef3c7;
+  --warning-text: #d97706;
+  --error-bg: #fee2e2;
+  --error-text: #dc2626;
+  --info-bg: #dbeafe;
+  --info-text: #2563eb;
+}
+
+/* Dark Mode Variables */
+.dark-mode {
+  /* Colors */
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --border-color: #334155;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --shadow-lg: rgba(0, 0, 0, 0.5);
+  
+  /* Glass Effects - Darker */
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(148, 163, 184, 0.2);
+  --glass-shadow: rgba(0, 0, 0, 0.3);
+  
+  /* Card Backgrounds */
+  --card-bg: #1e293b;
+  --card-hover: #334155;
+  
+  /* Input Backgrounds */
+  --input-bg: #1e293b;
+  --input-border: #334155;
+  --input-focus: #6366f1;
+  
+  /* Sidebar - Darker gradient */
+  --sidebar-bg: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+  --sidebar-text: #f1f5f9;
+  --sidebar-active: rgba(255, 255, 255, 0.1);
+  
+  /* Status Colors - Darker versions */
+  --success-bg: rgba(16, 185, 129, 0.2);
+  --success-text: #34d399;
+  --warning-bg: rgba(245, 158, 11, 0.2);
+  --warning-text: #fbbf24;
+  --error-bg: rgba(239, 68, 68, 0.2);
+  --error-text: #f87171;
+  --info-bg: rgba(59, 130, 246, 0.2);
+  --info-text: #60a5fa;
+}
+
+/* Smooth Transitions for Theme Switching */
+body,
+.app-layout,
+.main-content,
+.card,
+.stat-card,
+.task-card,
+.glass-card,
+input,
+textarea,
+select,
+button {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* ============================================
+   DARK MODE SPECIFIC OVERRIDES
+   ============================================ */
+
+.dark-mode {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Main Layout */
+.dark-mode .main-content {
+  background-color: var(--bg-primary);
+}
+
+/* Cards */
+.dark-mode .card,
+.dark-mode .stat-card,
+.dark-mode .task-card,
+.dark-mode .upload-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  box-shadow: 0 4px 20px var(--shadow);
+}
+
+.dark-mode .card:hover,
+.dark-mode .stat-card:hover,
+.dark-mode .task-card:hover {
+  background: var(--card-hover);
+}
+
+/* Glass Effects in Dark Mode */
+.dark-mode .glass-card,
+.dark-mode .glass-card-strong,
+.dark-mode .glass-card-subtle {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px var(--glass-shadow);
+}
+
+.dark-mode .glass-card-dark {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+/* Inputs */
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+}
+
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.dark-mode input:focus,
+.dark-mode textarea:focus,
+.dark-mode select:focus {
+  border-color: var(--input-focus);
+  background: var(--bg-tertiary);
+}
+
+/* Buttons */
+.dark-mode .btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.dark-mode .btn-secondary:hover {
+  background: var(--border-color);
+}
+
+/* Sidebar Adjustments */
+.dark-mode .sidebar {
+  background: var(--sidebar-bg);
+}
+
+/* Text Colors */
+.dark-mode .list-subtitle,
+.dark-mode .text-secondary,
+.dark-mode .description {
+  color: var(--text-secondary);
+}
+
+/* Borders */
+.dark-mode .card-header,
+.dark-mode .task-footer,
+.dark-mode .list-item {
+  border-color: var(--border-color);
+}
+
+/* Shadows - Reduced in dark mode */
+.dark-mode .shadow-sm {
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+.dark-mode .shadow-md {
+  box-shadow: 0 4px 6px var(--shadow);
+}
+
+.dark-mode .shadow-lg {
+  box-shadow: 0 10px 15px var(--shadow-lg);
+}
+
+/* Status Badges */
+.dark-mode .badge.success {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.dark-mode .badge.warning {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.dark-mode .badge.error {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.dark-mode .badge.info {
+  background: var(--info-bg);
+  color: var(--info-text);
+}
+
+/* Alert Boxes */
+.dark-mode .alert-success {
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-color: var(--success-text);
+}
+
+.dark-mode .alert-warning {
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-color: var(--warning-text);
+}
+
+.dark-mode .alert-error {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border-color: var(--error-text);
+}
+
+/* Tables */
+.dark-mode table {
+  background: var(--card-bg);
+}
+
+.dark-mode th {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.dark-mode td {
+  border-color: var(--border-color);
+}
+
+.dark-mode tbody tr:hover {
+  background: var(--card-hover);
+}
+
+/* Modals */
+.dark-mode .modal-content,
+.dark-mode .modal-header,
+.dark-mode .modal-body,
+.dark-mode .modal-footer {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+/* Dropdowns */
+.dark-mode .dropdown-menu {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  box-shadow: 0 10px 25px var(--shadow-lg);
+}
+
+.dark-mode .dropdown-item:hover {
+  background: var(--card-hover);
+}
+
+/* Tooltips */
+.dark-mode .tooltip {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* Code Blocks */
+.dark-mode code,
+.dark-mode pre {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+/* Scrollbars in Dark Mode */
+.dark-mode::-webkit-scrollbar {
+  width: 12px;
+  background: var(--bg-secondary);
+}
+
+.dark-mode::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 6px;
+}
+
+.dark-mode::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Gradient Adjustments in Dark Mode */
+.dark-mode .gradient-border {
+  border: 2px solid;
+  border-image: linear-gradient(135deg, #667eea, #764ba2) 1;
+}
+
+/* Avatar Borders */
+.dark-mode .avatar {
+  border: 2px solid var(--border-color);
+}
+
+/* Loading Spinner */
+.dark-mode .spinner {
+  border-color: var(--border-color);
+  border-top-color: #6366f1;
+}
+
+/* Empty States */
+.dark-mode .empty-state {
+  color: var(--text-secondary);
+}
+
+.dark-mode .empty-state-icon {
+  opacity: 0.3;
+}
+
+/* File Upload Areas */
+.dark-mode .file-input-label {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.dark-mode .file-input-label:hover {
+  background: var(--card-hover);
+  border-color: var(--input-focus);
+}
+
+/* Celebration Countdown - Gradient Adjustments */
+.dark-mode .celebration-countdown {
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.2), 
+    rgba(118, 75, 162, 0.2));
+  border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+/* Activity Feed in Dark Mode */
+.dark-mode .activity-item {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+.dark-mode .activity-item:hover {
+  background: var(--card-hover);
+}
+
+/* Notification Bell */
+.dark-mode .notification-dropdown {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  box-shadow: 0 10px 40px var(--shadow-lg);
+}
+
+/* Toast Notifications */
+.dark-mode .toast {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+  box-shadow: 0 8px 24px var(--shadow-lg);
+}
+
+/* Quick Actions Spotlight */
+.dark-mode .spotlight-modal {
+  background: rgba(15, 23, 42, 0.95);
+}
+
+.dark-mode .spotlight-content {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.dark-mode .spotlight-item:hover {
+  background: var(--card-hover);
+}
+
+/* ============================================
+   DARK MODE MEDIA QUERIES
+   ============================================ */
+
+/* Reduce glass blur on mobile for performance */
+@media (max-width: 768px) {
+  .dark-mode .glass-card,
+  .dark-mode .glass-card-strong,
+  .dark-mode .glass-card-subtle {
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .dark-mode {
+    --border-color: #64748b;
+    --text-secondary: #e2e8f0;
+  }
+  
+  .dark-mode .glass-card {
+    background: rgba(30, 41, 59, 0.95);
+    border-width: 2px;
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .dark-mode * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   DARK MODE UTILITIES
+   ============================================ */
+
+/* Dark mode specific utilities */
+.dark-only {
+  display: none;
+}
+
+.dark-mode .dark-only {
+  display: block;
+}
+
+.light-only {
+  display: block;
+}
+
+.dark-mode .light-only {
+  display: none;
+}
+
+/* Text color utilities */
+.text-dark-primary {
+  color: var(--text-primary);
+}
+
+.text-dark-secondary {
+  color: var(--text-secondary);
+}
+
+.text-dark-tertiary {
+  color: var(--text-tertiary);
+}
+
+/* Background utilities */
+.bg-dark-primary {
+  background: var(--bg-primary);
+}
+
+.bg-dark-secondary {
+  background: var(--bg-secondary);
+}
+
+.bg-dark-tertiary {
+  background: var(--bg-tertiary);
+}
+
+/* Border utilities */
+.border-dark {
+  border-color: var(--border-color);
+}
+
+/* ============================================
+   DARK MODE ANIMATIONS
+   ============================================ */
+
+/* Smooth theme transition animation */
+@keyframes theme-fade {
+  from {
+    opacity: 0.95;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dark-mode .main-content {
+  animation: theme-fade 0.3s ease-in-out;
+}
+
+/* Glow effects in dark mode */
+.dark-mode .glow-on-hover:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4),
+              0 0 40px rgba(99, 102, 241, 0.2);
+}

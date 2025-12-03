@@ -18,6 +18,8 @@ import FileUpload from './pages/FileUpload';
 import Profile from './pages/Profile';
 import TimesheetLink from './pages/TimesheetLink';
 import './App.css';
+import './styles/glassmorphism.css';
+import './styles/dark-theme.css';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
