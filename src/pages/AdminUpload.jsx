@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import dataManager from '../utils/dataManager';
-import './AdminUpload.css';
+import '../styles/AdminUpload.css';
 
 export default function AdminUpload() {
   const { currentUser } = useAuth();

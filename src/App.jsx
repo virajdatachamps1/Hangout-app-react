@@ -17,9 +17,13 @@ import ProfileSetup from './pages/ProfileSetup';
 import FileUpload from './pages/FileUpload';
 import Profile from './pages/Profile';
 import TimesheetLink from './pages/TimesheetLink';
+import UpdateWorkAnniversaries from './pages/UpdateWorkAnniversaries';
+import PolicyChatbot from './pages/PolicyChatbot';
 import './App.css';
 import './styles/glassmorphism.css';
-import './styles/dark-theme.css';
+import PolicyUpload from './pages/PolicyUpload';
+
+
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
@@ -66,6 +70,9 @@ function App() {
             <Route path="file-upload" element={<FileUpload />} />
             <Route path="profile" element={<Profile />} />
             <Route path="timesheet-link" element={<TimesheetLink />} />
+            <Route path="update-anniversaries" element={<UpdateWorkAnniversaries />} />
+            <Route path="policy-chat" element={<PolicyChatbot />} />
+            <Route path="policy-upload" element={<PolicyUpload />} />
           </Route>
         </Routes>
       </Router>

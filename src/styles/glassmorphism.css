@@ -1,130 +1,199 @@
 /* ============================================
-   GLASSMORPHISM & PREMIUM STYLES
-   Modern frosted glass effects & gradient borders
+   GLASSMORPHISM & PREMIUM EFFECTS
+   Apple/macOS Inspired Glass Design
    ============================================ */
 
 /* ==========================================
-   GLASSMORPHISM CARDS
+   BASE GLASS EFFECTS
    ========================================== */
 
-/* Base glassmorphism effect */
-.glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+/* Subtle Glass - macOS Menu Bar Style */
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
-/* Stronger glass effect */
-.glass-card-strong {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-}
-
-/* Subtle glass effect */
-.glass-card-subtle {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+/* Medium Glass - macOS Sidebar Style */
+.glass-medium {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: saturate(180%) blur(30px);
+  -webkit-backdrop-filter: saturate(180%) blur(30px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Dark glass effect (for dark mode) */
-.glass-card-dark {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-/* Glass with gradient tint */
-.glass-card-gradient {
-  background: linear-gradient(
-    135deg,
-    rgba(102, 126, 234, 0.1),
-    rgba(118, 75, 162, 0.1)
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+/* Strong Glass - macOS Modal Style */
+.glass-strong {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: saturate(180%) blur(40px);
+  -webkit-backdrop-filter: saturate(180%) blur(40px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
 /* ==========================================
-   GRADIENT BORDERS
+   DARK GLASS EFFECTS (For Dark Backgrounds)
    ========================================== */
 
-/* Primary gradient border */
-.gradient-border {
-  position: relative;
-  background: white;
-  border-radius: 16px;
+/* Dark Glass - Subtle */
+.glass-dark {
+  background: rgba(28, 28, 30, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  color: white;
 }
 
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 2px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+/* Dark Glass - Medium */
+.glass-dark-medium {
+  background: rgba(28, 28, 30, 0.8);
+  backdrop-filter: saturate(180%) blur(30px);
+  -webkit-backdrop-filter: saturate(180%) blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  color: white;
 }
 
-/* Animated gradient border */
-.gradient-border-animated {
-  position: relative;
-  background: white;
-  border-radius: 16px;
+/* Dark Glass - Strong */
+.glass-dark-strong {
+  background: rgba(28, 28, 30, 0.9);
+  backdrop-filter: saturate(180%) blur(40px);
+  -webkit-backdrop-filter: saturate(180%) blur(40px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+  color: white;
 }
 
-.gradient-border-animated::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  padding: 2px;
-  background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #667eea);
-  background-size: 300% 300%;
-  animation: gradient-rotate 4s ease infinite;
-  -webkit-mask: 
-    linear-gradient(#fff 0 0) content-box, 
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+/* ==========================================
+   COLORED GLASS TINTS
+   ========================================== */
+
+/* Blue Tint - Like iOS Focus Mode */
+.glass-blue {
+  background: rgba(0, 122, 255, 0.08);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(0, 122, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 122, 255, 0.1);
 }
 
-@keyframes gradient-rotate {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+/* Purple Tint */
+.glass-purple {
+  background: rgba(88, 86, 214, 0.08);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(88, 86, 214, 0.15);
+  box-shadow: 0 4px 20px rgba(88, 86, 214, 0.1);
 }
 
-/* Subtle gradient border */
+/* Green Tint */
+.glass-green {
+  background: rgba(52, 199, 89, 0.08);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(52, 199, 89, 0.15);
+  box-shadow: 0 4px 20px rgba(52, 199, 89, 0.1);
+}
+
+/* Red Tint */
+.glass-red {
+  background: rgba(255, 59, 48, 0.08);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border: 1px solid rgba(255, 59, 48, 0.15);
+  box-shadow: 0 4px 20px rgba(255, 59, 48, 0.1);
+}
+
+/* ==========================================
+   COMPONENT-SPECIFIC GLASS
+   ========================================== */
+
+/* Sidebar Glass - macOS App Style */
+.sidebar-glass {
+  background: rgba(249, 249, 251, 0.72);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Card Glass - Floating Card Style */
+.card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(180%) blur(25px);
+  -webkit-backdrop-filter: saturate(180%) blur(25px);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+}
+
+/* Modal Glass - macOS Alert Style */
+.modal-glass {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(180%) blur(40px);
+  -webkit-backdrop-filter: saturate(180%) blur(40px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+}
+
+/* Dropdown Glass - macOS Menu Style */
+.dropdown-glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: saturate(180%) blur(30px);
+  -webkit-backdrop-filter: saturate(180%) blur(30px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+}
+
+/* Notification Glass - iOS Style */
+.notification-glass {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: saturate(180%) blur(25px);
+  -webkit-backdrop-filter: saturate(180%) blur(25px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  border-radius: 14px;
+}
+
+/* Button Glass */
+.btn-glass {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: saturate(180%) blur(15px);
+  -webkit-backdrop-filter: saturate(180%) blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ==========================================
+   GRADIENT BORDERS - Apple Style
+   ========================================== */
+
+/* Subtle Gradient Border */
 .gradient-border-subtle {
   position: relative;
   background: white;
-  border-radius: 16px;
+  border-radius: 14px;
 }
 
 .gradient-border-subtle::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 1px;
-  background: linear-gradient(135deg, #667eea30, #764ba230);
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.3), rgba(88, 86, 214, 0.3));
   -webkit-mask: 
     linear-gradient(#fff 0 0) content-box, 
     linear-gradient(#fff 0 0);
@@ -133,55 +202,78 @@
   pointer-events: none;
 }
 
-/* Glow gradient border */
-.gradient-border-glow {
+/* Vibrant Gradient Border */
+.gradient-border-vibrant {
   position: relative;
   background: white;
-  border-radius: 16px;
+  border-radius: 14px;
 }
 
-.gradient-border-glow::before {
+.gradient-border-vibrant::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 2px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #007AFF, #5856D6);
   -webkit-mask: 
     linear-gradient(#fff 0 0) content-box, 
     linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
-  filter: blur(0px);
-  transition: filter 0.3s;
 }
 
-.gradient-border-glow:hover::before {
-  filter: blur(8px);
+/* Animated Gradient Border - macOS Progress Style */
+.gradient-border-animated {
+  position: relative;
+  background: white;
+  border-radius: 14px;
+}
+
+.gradient-border-animated::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  padding: 2px;
+  background: linear-gradient(135deg, #007AFF, #5856D6, #34C759, #FF9500, #007AFF);
+  background-size: 300% 300%;
+  animation: gradient-shift 6s ease infinite;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
 }
 
 /* ==========================================
-   GLASS + GRADIENT COMBO
+   GLASS + GRADIENT COMBINATIONS
    ========================================== */
 
-/* Glass card with gradient border */
+/* Glass Card with Gradient Border */
 .glass-gradient-card {
   position: relative;
   background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: saturate(180%) blur(25px);
+  -webkit-backdrop-filter: saturate(180%) blur(25px);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .glass-gradient-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 16px;
-  padding: 2px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 14px;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.4), rgba(88, 86, 214, 0.4));
   -webkit-mask: 
     linear-gradient(#fff 0 0) content-box, 
     linear-gradient(#fff 0 0);
@@ -191,288 +283,233 @@
 }
 
 /* ==========================================
-   UTILITY CLASSES
+   HOVER EFFECTS
    ========================================== */
 
-/* Apply glass to specific elements */
-.sidebar-glass {
-  background: rgba(79, 70, 229, 0.85);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+.glass-hover {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.card-glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-.modal-glass {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.dropdown-glass {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-/* ==========================================
-   PREMIUM BUTTON STYLES
-   ========================================== */
-
-/* Glass button */
-.btn-glass {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.btn-glass:hover {
-  background: rgba(255, 255, 255, 0.3);
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.85);
   transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
-/* Gradient button with glass effect */
-.btn-gradient-glass {
-  position: relative;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  overflow: hidden;
-}
-
-.btn-gradient-glass::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.5s;
-}
-
-.btn-gradient-glass:hover::before {
-  left: 100%;
+.glass-hover:active {
+  transform: translateY(0);
 }
 
 /* ==========================================
-   SPECIAL EFFECTS
+   FROSTED TEXT EFFECT
    ========================================== */
 
-/* Frosted glass text */
-.text-glass {
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.text-frosted {
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
 
-/* Glass divider */
-.divider-glass {
+/* ==========================================
+   VIBRANCY LAYERS (iOS Style)
+   ========================================== */
+
+.vibrancy-light {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.vibrancy-medium {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: saturate(150%) blur(15px);
+  -webkit-backdrop-filter: saturate(150%) blur(15px);
+}
+
+.vibrancy-strong {
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: saturate(120%) blur(10px);
+  -webkit-backdrop-filter: saturate(120%) blur(10px);
+}
+
+/* ==========================================
+   DIVIDERS & SEPARATORS
+   ========================================== */
+
+.glass-divider {
   height: 1px;
   background: linear-gradient(
     90deg,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0.5),
-    rgba(255, 255, 255, 0)
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.08),
+    rgba(0, 0, 0, 0)
   );
   backdrop-filter: blur(1px);
 }
 
-/* Spotlight glass background */
-.spotlight-glass {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+.glass-separator {
+  width: 1px;
+  background: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(1px);
 }
 
 /* ==========================================
-   RESPONSIVE GLASS EFFECTS
+   OVERLAY EFFECTS
    ========================================== */
 
-/* Reduce blur on low-end devices */
+.glass-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 999;
+}
+
+.glass-overlay-light {
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+}
+
+/* ==========================================
+   SPOTLIGHT EFFECT (macOS)
+   ========================================== */
+
+.spotlight-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(200%) blur(50px);
+  -webkit-backdrop-filter: saturate(200%) blur(50px);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
+}
+
+/* ==========================================
+   RESPONSIVE & PERFORMANCE
+   ========================================== */
+
+/* Reduce blur on mobile for performance */
 @media (max-width: 768px) {
-  .glass-card,
-  .glass-card-strong,
-  .glass-card-subtle,
-  .glass-gradient-card,
-  .card-glass {
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+  .glass-subtle,
+  .glass-medium,
+  .glass-strong,
+  .card-glass,
+  .notification-glass {
+    backdrop-filter: saturate(180%) blur(15px);
+    -webkit-backdrop-filter: saturate(180%) blur(15px);
   }
   
   .modal-glass,
   .spotlight-glass {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: saturate(180%) blur(25px);
+    -webkit-backdrop-filter: saturate(180%) blur(25px);
   }
+}
+
+/* GPU acceleration for smooth animations */
+.glass-animated,
+.glass-hover {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform, backdrop-filter;
 }
 
 /* ==========================================
    BROWSER FALLBACKS
    ========================================== */
 
-/* Fallback for browsers that don't support backdrop-filter */
 @supports not (backdrop-filter: blur(10px)) {
-  .glass-card,
-  .glass-card-strong,
-  .glass-card-subtle,
+  .glass-subtle,
+  .glass-medium,
   .card-glass {
     background: rgba(255, 255, 255, 0.95);
   }
   
-  .glass-card-dark {
-    background: rgba(0, 0, 0, 0.85);
-  }
-  
-  .modal-glass,
-  .spotlight-glass,
-  .dropdown-glass {
+  .glass-strong,
+  .modal-glass {
     background: rgba(255, 255, 255, 0.98);
   }
-}
-
-/* ==========================================
-   THEMED GLASS CARDS
-   ========================================== */
-
-/* Success glass */
-.glass-success {
-  background: rgba(16, 185, 129, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-/* Error glass */
-.glass-error {
-  background: rgba(239, 68, 68, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-/* Warning glass */
-.glass-warning {
-  background: rgba(245, 158, 11, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-/* Info glass */
-.glass-info {
-  background: rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-}
-
-/* ==========================================
-   HOVER EFFECTS FOR GLASS
-   ========================================== */
-
-.glass-hover {
-  transition: all 0.3s ease;
-}
-
-.glass-hover:hover {
-  background: rgba(255, 255, 255, 0.8);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Gradient border hover effect */
-.gradient-border-hover {
-  transition: all 0.3s ease;
-}
-
-.gradient-border-hover:hover::before {
-  padding: 3px;
-}
-
-/* ==========================================
-   LAYOUT HELPERS
-   ========================================== */
-
-/* Glass container for groups of cards */
-.glass-container {
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 20px;
-  border-radius: 20px;
-}
-
-/* Glass section separator */
-.glass-section {
-  background: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  margin: 20px 0;
-  padding: 1px;
-  border-radius: 1px;
-}
-
-/* ==========================================
-   PERFORMANCE OPTIMIZATIONS
-   ========================================== */
-
-/* Use will-change for animated glass elements */
-.glass-animated {
-  will-change: backdrop-filter, transform;
-}
-
-/* GPU acceleration hint */
-.glass-gpu {
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  
+  .glass-dark,
+  .glass-dark-medium,
+  .glass-dark-strong {
+    background: rgba(28, 28, 30, 0.95);
+  }
 }
 
 /* ==========================================
    ACCESSIBILITY
    ========================================== */
 
-/* Ensure text is readable on glass */
-.glass-card * {
+/* Ensure readable text on glass */
+.glass-subtle *,
+.glass-medium *,
+.glass-strong *,
+.card-glass * {
   position: relative;
   z-index: 1;
 }
 
 /* High contrast mode */
 @media (prefers-contrast: high) {
-  .glass-card,
-  .glass-card-strong,
-  .glass-card-subtle {
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid rgba(0, 0, 0, 0.8);
+  .glass-subtle,
+  .glass-medium,
+  .glass-strong,
+  .card-glass {
+    background: rgba(255, 255, 255, 0.98);
+    border: 2px solid rgba(0, 0, 0, 0.5);
   }
 }
 
 /* Reduced transparency mode */
 @media (prefers-reduced-transparency: reduce) {
-  .glass-card,
-  .glass-card-strong,
-  .glass-card-subtle,
-  .card-glass {
-    background: rgba(255, 255, 255, 0.95);
+  .glass-subtle,
+  .glass-medium,
+  .glass-strong,
+  .card-glass,
+  .modal-glass,
+  .notification-glass {
+    background: rgba(255, 255, 255, 0.98);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
+  
+  .glass-dark,
+  .glass-dark-medium,
+  .glass-dark-strong {
+    background: rgba(28, 28, 30, 0.98);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* ==========================================
+   UTILITY CLASSES
+   ========================================== */
+
+.blur-light { 
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.blur-medium { 
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.blur-strong { 
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+}
+
+.saturate { 
+  backdrop-filter: saturate(180%);
+  -webkit-backdrop-filter: saturate(180%);
+}
+
+.saturate-strong { 
+  backdrop-filter: saturate(200%);
+  -webkit-backdrop-filter: saturate(200%);
 }

@@ -1,48 +1,90 @@
-import { CheckSquare, Users, Calendar, Award } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import LiveActivityFeed from '../components/LiveActivityFeed';
-import CelebrationCountdown from '../components/CelebrationCountdown';
+import { CheckSquare, Users, Calendar, Award } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import firestoreService from '../utils/firestoreService';
+
 function Dashboard() {
-  const [loading] = useState(false);
-  
-  // Mock data for demonstration
-  const upcomingCelebrations = {
-    birthdays: [
-      { name: 'Sarah Johnson', department: 'Marketing', upcomingDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) },
-      { name: 'Mike Chen', department: 'Engineering', upcomingDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000) }
-    ],
-    anniversaries: [
-      { name: 'Emma Wilson', department: 'Design', upcomingDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) }
-    ]
+  const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState({
+    employees: [],
+    upcomingBirthdays: [],
+    recentKudos: [],
+    stats: {
+      teamMembers: 0,
+      upcomingEvents: 0,
+      kudosThisMonth: 0
+    }
+  });
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      // Load all data in parallel
+      const [employees, birthdays, kudos] = await Promise.all([
+        firestoreService.employees.getAll(),
+        firestoreService.employees.getUpcomingBirthdays(30),
+        firestoreService.kudos.getRecent(5)
+      ]);
+
+      // Calculate stats
+      const stats = {
+        teamMembers: employees.length,
+        upcomingEvents: birthdays.length,
+        kudosThisMonth: kudos.length // This should filter by current month
+      };
+
+      setData({
+        employees,
+        upcomingBirthdays: birthdays.slice(0, 3), // Top 3
+        recentKudos: kudos.slice(0, 2), // Top 2
+        stats
+      });
+    } catch (error) {
+      console.error('Error loading dashboard:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+      </div>
+    );
+  }
+
   const stats = [
-    { icon: CheckSquare, label: 'Pending Tasks', value: '12', color: 'blue' },
-    { icon: Users, label: 'Team Members', value: '24', color: 'green' },
-    { icon: Calendar, label: 'Upcoming Events', value: '5', color: 'purple' },
-    { icon: Award, label: 'Kudos This Month', value: '18', color: 'orange' },
-  ];
-
-  const upcomingBirthdays = [
-    { name: 'John Doe', date: 'Nov 15' },
-    { name: 'Jane Smith', date: 'Nov 18' },
-    { name: 'Mike Johnson', date: 'Nov 22' },
-  ];
-
-  const recentKudos = [
-    { from: 'Sarah', to: 'Tom', message: 'Great job on the presentation!' },
-    { from: 'Alex', to: 'Emma', message: 'Thanks for your help yesterday' },
-  ];
-
-  const recentActivity = [
-    { user: 'John', action: 'completed task "Update reports"', time: '2 hours ago' },
-    { user: 'Sarah', action: 'added new SOP document', time: '3 hours ago' },
-    { user: 'Mike', action: 'submitted timesheet', time: '5 hours ago' },
+    { 
+      icon: Users, 
+      label: 'Team Members', 
+      value: data.stats.teamMembers.toString(), 
+      color: 'green' 
+    },
+    { 
+      icon: Calendar, 
+      label: 'Upcoming Birthdays', 
+      value: data.stats.upcomingEvents.toString(), 
+      color: 'purple' 
+    },
+    { 
+      icon: Award, 
+      label: 'Kudos This Month', 
+      value: data.stats.kudosThisMonth.toString(), 
+      color: 'orange' 
+    },
   ];
 
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Welcome Back!</h1>
+        <h1>Welcome Back, {currentUser?.displayName || currentUser?.email?.split('@')[0]}!</h1>
         <p>Here's what's happening in your team today</p>
       </div>
 
@@ -61,98 +103,110 @@ function Dashboard() {
       </div>
 
       <div className="dashboard-grid">
-        {/* Live Activity Feed */}
-        <div style={{ gridColumn: 'span 1' }}>
-          <LiveActivityFeed />
-        </div>
-
-        {/* Upcoming Celebrations with Countdowns */}
+        {/* Upcoming Birthdays */}
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">
               <Calendar size={20} />
-              This Week's Celebrations
+              Upcoming Birthdays
             </h3>
-            <span className="card-action">View All</span>
+            <span className="card-action" onClick={() => window.location.href = '/celebrations'}>
+              View All
+            </span>
           </div>
-          
-          {loading ? (
-            <div style={{ padding: '20px', textAlign: 'center' }}>
-              <div className="spinner-fancy" style={{ margin: '0 auto' }} />
+          {data.upcomingBirthdays.length === 0 ? (
+            <div className="empty-state">
+              <p style={{ fontSize: '14px', color: '#999', padding: '20px' }}>
+                No upcoming birthdays in the next 30 days
+              </p>
             </div>
           ) : (
-            <>
-              {upcomingCelebrations.birthdays.slice(0, 2).map((birthday, index) => (
-                <div key={index} style={{ marginBottom: '16px' }}>
-                  <CelebrationCountdown
-                    name={birthday.name}
-                    type="birthday"
-                    date={birthday.upcomingDate}
-                    department={birthday.department}
-                    onRemind={() => console.log('Remind me:', birthday.name)}
-                  />
+            data.upcomingBirthdays.map((person, index) => (
+              <div key={index} className="list-item">
+                <div className="avatar">
+                  {person.name?.charAt(0)?.toUpperCase() || '?'}
                 </div>
-              ))}
-              
-              {upcomingCelebrations.anniversaries.slice(0, 1).map((anniversary, index) => (
-                <div key={`anniv-${index}`} style={{ marginBottom: '16px' }}>
-                  <CelebrationCountdown
-                    name={anniversary.name}
-                    type="anniversary"
-                    date={anniversary.upcomingDate}
-                    department={anniversary.department}
-                    onRemind={() => console.log('Remind me:', anniversary.name)}
-                  />
+                <div className="list-content">
+                  <div className="list-title">{person.name}</div>
+                  <div className="list-subtitle">
+                    {person.daysUntil === 0 
+                      ? 'Today!' 
+                      : person.daysUntil === 1 
+                      ? 'Tomorrow' 
+                      : `In ${person.daysUntil} days`}
+                  </div>
                 </div>
-              ))}
-              
-              {upcomingCelebrations.birthdays.length === 0 && upcomingCelebrations.anniversaries.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '40px 20px', color: '#999' }}>
-                  <Calendar size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
-                  <p>No upcoming celebrations this week</p>
-                </div>
-              )}
-            </>
+                <span className="badge success">🎂</span>
+              </div>
+            ))
           )}
         </div>
 
+        {/* Recent Kudos */}
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">
               <Award size={20} />
               Recent Kudos
             </h3>
-            <span className="card-action">View All</span>
+            <span className="card-action" onClick={() => window.location.href = '/kudos'}>
+              View All
+            </span>
           </div>
-          {recentKudos.map((kudo, index) => (
-            <div key={index} className="list-item">
-              <div className="avatar">{kudo.from.charAt(0)}</div>
-              <div className="list-content">
-                <div className="list-title">{kudo.from} → {kudo.to}</div>
-                <div className="list-subtitle">{kudo.message}</div>
-              </div>
+          {data.recentKudos.length === 0 ? (
+            <div className="empty-state">
+              <p style={{ fontSize: '14px', color: '#999', padding: '20px' }}>
+                No kudos yet. Be the first to recognize someone!
+              </p>
             </div>
-          ))}
+          ) : (
+            data.recentKudos.map((kudo, index) => (
+              <div key={index} className="list-item">
+                <div className="avatar">
+                  {kudo.fromName?.charAt(0)?.toUpperCase() || '?'}
+                </div>
+                <div className="list-content">
+                  <div className="list-title">
+                    {kudo.fromName || 'Unknown'} → {kudo.toName || 'Unknown'}
+                  </div>
+                  <div className="list-subtitle">{kudo.message || ''}</div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
+        {/* Quick Actions */}
         <div className="card">
           <div className="card-header">
             <h3 className="card-title">
-              <Users size={20} />
-              Recent Activity
+              <CheckSquare size={20} />
+              Quick Actions
             </h3>
           </div>
-          {recentActivity.map((activity, index) => (
-            <div key={index} className="list-item">
-              <div className="avatar">{activity.user.charAt(0)}</div>
-              <div className="list-content">
-                <div className="list-title">{activity.user}</div>
-                <div className="list-subtitle">
-                  {activity.action} • {activity.time}
-                </div>
-              </div>
-            </div>
-          ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '8px 0' }}>
+            <button 
+              className="quick-action-btn"
+              onClick={() => window.location.href = '/kudos'}
+            >
+              <Award size={18} />
+              Give Kudos
+            </button>
+            <button 
+              className="quick-action-btn"
+              onClick={() => window.location.href = '/timesheets'}
+            >
+              <Calendar size={18} />
+              View Timesheet
+            </button>
+            <button 
+              className="quick-action-btn"
+              onClick={() => window.location.href = '/sops'}
+            >
+              <CheckSquare size={18} />
+              Browse SOPs
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,120 +1,94 @@
-// src/pages/Announcements.jsx
+import { Bell, Pin, AlertCircle, Info, CheckCircle, Clock, Plus, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { collection, addDoc, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase';
-import { Bell, Pin, AlertCircle, Info, CheckCircle, Calendar as CalendarIcon, Award, Plus, X } from 'lucide-react';
+import firestoreService from '../utils/firestoreService';
 
 function Announcements() {
-  const { userData } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
+  const [filter, setFilter] = useState('all');
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [filter, setFilter] = useState('all');
-
+  const [showAddModal, setShowAddModal] = useState(false);
+  
   // Form state
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [type, setType] = useState('general');
-  const [isPinned, setIsPinned] = useState(false);
+  const [newAnnouncement, setNewAnnouncement] = useState({
+    type: 'info',
+    title: '',
+    message: '',
+    isPinned: false
+  });
 
-  const announcementTypes = {
-    general: { 
-      icon: Info, 
-      color: '#3b82f6', 
-      bg: '#dbeafe', 
-      label: 'General' 
-    },
-    important: { 
-      icon: AlertCircle, 
-      color: '#ef4444', 
-      bg: '#fee2e2', 
-      label: 'Important' 
-    },
-    success: { 
-      icon: CheckCircle, 
-      color: '#10b981', 
-      bg: '#d1fae5', 
-      label: 'Success' 
-    },
-    holiday: { 
-      icon: CalendarIcon, 
-      color: '#f59e0b', 
-      bg: '#fef3c7', 
-      label: 'Holiday' 
-    },
-    certificate: { 
-      icon: Award, 
-      color: '#8b5cf6', 
-      bg: '#ede9fe', 
-      label: 'Certificate' 
-    },
-    event: { 
-      icon: CalendarIcon, 
-      color: '#ec4899', 
-      bg: '#fce7f3', 
-      label: 'Event' 
-    }
+  const typeConfig = {
+    important: { icon: AlertCircle, color: '#ef4444', bg: '#fee2e2', label: 'Important' },
+    update: { icon: Info, color: '#3b82f6', bg: '#dbeafe', label: 'Update' },
+    success: { icon: CheckCircle, color: '#10b981', bg: '#d1fae5', label: 'Success' },
+    info: { icon: Clock, color: '#f59e0b', bg: '#fef3c7', label: 'Info' }
   };
 
   useEffect(() => {
-    fetchAnnouncements();
+    loadAnnouncements();
   }, []);
 
-  const fetchAnnouncements = async () => {
+  const loadAnnouncements = async () => {
     try {
-      const q = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'));
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      setLoading(true);
+      const data = await firestoreService.announcements.getAll();
       setAnnouncements(data);
     } catch (error) {
-      console.error('Error fetching announcements:', error);
+      console.error('Error loading announcements:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!title.trim() || !message.trim()) {
+  const handleCreateAnnouncement = async () => {
+    if (!newAnnouncement.title || !newAnnouncement.message) {
       alert('Please fill in all fields');
       return;
     }
 
-    setSending(true);
     try {
-      await addDoc(collection(db, 'announcements'), {
-        title: title.trim(),
-        message: message.trim(),
-        type,
-        isPinned,
-        author: userData.name,
-        authorEmail: userData.email,
-        createdAt: Timestamp.now(),
-        readBy: []
+      await firestoreService.announcements.create({
+        ...newAnnouncement,
+        author: currentUser.displayName || currentUser.email,
+        authorEmail: currentUser.email,
+        totalReads: 0
       });
 
-      alert('✅ Announcement posted!');
-      setShowForm(false);
-      setTitle('');
-      setMessage('');
-      setType('general');
-      setIsPinned(false);
-      fetchAnnouncements();
+      // Reset form and close modal
+      setNewAnnouncement({
+        type: 'info',
+        title: '',
+        message: '',
+        isPinned: false
+      });
+      setShowAddModal(false);
+      
+      // Reload announcements
+      loadAnnouncements();
     } catch (error) {
       console.error('Error creating announcement:', error);
-      alert('Failed to post announcement');
-    } finally {
-      setSending(false);
+      alert('Failed to create announcement');
     }
   };
 
-  const canPost = userData?.role === 'admin' || userData?.role === 'hr';
+  const handleMarkAsRead = async (announcementId) => {
+    try {
+      await firestoreService.announcements.markAsRead(announcementId, currentUser.uid);
+      loadAnnouncements();
+    } catch (error) {
+      console.error('Error marking as read:', error);
+    }
+  };
+
+  const handleTogglePin = async (announcementId) => {
+    try {
+      await firestoreService.announcements.togglePin(announcementId);
+      loadAnnouncements();
+    } catch (error) {
+      console.error('Error toggling pin:', error);
+    }
+  };
 
   const filteredAnnouncements = filter === 'all' 
     ? announcements 
@@ -122,7 +96,7 @@ function Announcements() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+      <div className="loading">
         <div className="spinner"></div>
       </div>
     );
@@ -148,9 +122,10 @@ function Announcements() {
               Stay updated with company news and updates
             </p>
           </div>
-          {canPost && (
-            <button
-              onClick={() => setShowForm(!showForm)}
+          
+          {isAdmin && (
+            <button 
+              onClick={() => setShowAddModal(true)}
               style={{
                 padding: '14px 28px',
                 background: 'white',
@@ -173,174 +148,6 @@ function Announcements() {
         </div>
       </div>
 
-      {/* Create Announcement Form */}
-      {showForm && canPost && (
-        <div style={{
-          background: 'white',
-          padding: '32px',
-          borderRadius: '20px',
-          marginBottom: '32px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-          border: '1px solid rgba(0, 0, 0, 0.05)'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: '600' }}>
-              Create Announcement
-            </h3>
-            <button
-              onClick={() => setShowForm(false)}
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                border: 'none',
-                background: '#f5f5f5',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit}>
-            {/* Title */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
-                Title
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter announcement title..."
-                required
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  border: '2px solid #f0f0f0',
-                  borderRadius: '12px',
-                  fontSize: '15px',
-                  transition: 'border 0.2s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#4facfe'}
-                onBlur={(e) => e.target.style.borderColor = '#f0f0f0'}
-              />
-            </div>
-
-            {/* Type Selection */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '12px', fontSize: '14px', fontWeight: '600' }}>
-                Type
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-                {Object.entries(announcementTypes).map(([key, config]) => {
-                  const Icon = config.icon;
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => setType(key)}
-                      style={{
-                        padding: '14px',
-                        background: type === key ? config.bg : '#f5f5f5',
-                        border: `2px solid ${type === key ? config.color : '#e0e0e0'}`,
-                        borderRadius: '12px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        transition: 'all 0.2s',
-                        fontSize: '14px',
-                        fontWeight: '600',
-                        color: type === key ? config.color : '#666'
-                      }}
-                    >
-                      <Icon size={18} />
-                      {config.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Message */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
-                Message
-              </label>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Write your announcement message..."
-                required
-                rows="6"
-                style={{
-                  width: '100%',
-                  padding: '14px',
-                  border: '2px solid #f0f0f0',
-                  borderRadius: '12px',
-                  fontSize: '15px',
-                  fontFamily: 'inherit',
-                  resize: 'vertical',
-                  transition: 'border 0.2s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#4facfe'}
-                onBlur={(e) => e.target.style.borderColor = '#f0f0f0'}
-              />
-            </div>
-
-            {/* Pin Option */}
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '600'
-              }}>
-                <input
-                  type="checkbox"
-                  checked={isPinned}
-                  onChange={(e) => setIsPinned(e.target.checked)}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
-                <Pin size={16} />
-                Pin this announcement to the top
-              </label>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={sending}
-              style={{
-                width: '100%',
-                padding: '14px',
-                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                border: 'none',
-                borderRadius: '12px',
-                fontSize: '15px',
-                fontWeight: '600',
-                cursor: sending ? 'not-allowed' : 'pointer',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                opacity: sending ? 0.7 : 1
-              }}
-            >
-              <Bell size={18} />
-              {sending ? 'Posting...' : 'Post Announcement'}
-            </button>
-          </form>
-        </div>
-      )}
-
       {/* Stats */}
       <div style={{
         display: 'grid',
@@ -348,12 +155,11 @@ function Announcements() {
         gap: '20px',
         marginBottom: '32px'
       }}>
-        {Object.entries(announcementTypes).map(([key, config]) => {
-          const count = announcements.filter(a => a.type === key).length;
-          const Icon = config.icon;
+        {Object.entries(typeConfig).map(([type, config]) => {
+          const count = announcements.filter(a => a.type === type).length;
           return (
             <div 
-              key={key}
+              key={type}
               style={{
                 background: 'white',
                 padding: '20px',
@@ -361,9 +167,9 @@ function Announcements() {
                 boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)',
                 cursor: 'pointer',
                 transition: 'all 0.2s',
-                border: filter === key ? `2px solid ${config.color}` : '2px solid transparent'
+                border: filter === type ? `2px solid ${config.color}` : '2px solid transparent'
               }}
-              onClick={() => setFilter(filter === key ? 'all' : key)}
+              onClick={() => setFilter(filter === type ? 'all' : type)}
               onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
               onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
@@ -377,7 +183,7 @@ function Announcements() {
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
-                  <Icon size={20} color={config.color} />
+                  <config.icon size={20} color={config.color} />
                 </div>
                 <div>
                   <div style={{ fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>
@@ -394,27 +200,17 @@ function Announcements() {
       </div>
 
       {/* Announcements Feed */}
-      {filteredAnnouncements.length === 0 ? (
-        <div style={{
-          background: 'white',
-          padding: '80px 40px',
-          borderRadius: '24px',
-          textAlign: 'center',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)'
-        }}>
-          <Bell size={64} color="#ddd" style={{ marginBottom: '20px' }} />
-          <h3 style={{ fontSize: '22px', marginBottom: '12px', color: '#111' }}>
-            No Announcements
-          </h3>
-          <p style={{ color: '#666', fontSize: '16px' }}>
-            {filter === 'all' ? 'Check back later for updates' : `No ${announcementTypes[filter]?.label.toLowerCase()} announcements`}
-          </p>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {filteredAnnouncements.map(announcement => {
-            const config = announcementTypes[announcement.type];
-            const Icon = config.icon;
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {filteredAnnouncements.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">📢</div>
+            <p>No announcements found</p>
+          </div>
+        ) : (
+          filteredAnnouncements.map(announcement => {
+            const config = typeConfig[announcement.type];
+            const StatusIcon = config.icon;
+            const hasRead = announcement.readBy?.includes(currentUser.uid);
             
             return (
               <div 
@@ -437,6 +233,7 @@ function Announcements() {
                   e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.06)';
                 }}
               >
+                {/* Pin indicator */}
                 {announcement.isPinned && (
                   <div style={{
                     position: 'absolute',
@@ -448,12 +245,17 @@ function Announcements() {
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
+                    justifyContent: 'center',
+                    cursor: isAdmin ? 'pointer' : 'default'
+                  }}
+                  onClick={() => isAdmin && handleTogglePin(announcement.id)}
+                  title={isAdmin ? "Click to unpin" : "Pinned"}
+                  >
                     <Pin size={16} color="white" />
                   </div>
                 )}
 
+                {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'start', gap: '16px', marginBottom: '16px' }}>
                   <div style={{
                     width: '48px',
@@ -465,7 +267,7 @@ function Announcements() {
                     justifyContent: 'center',
                     flexShrink: 0
                   }}>
-                    <Icon size={24} color={config.color} />
+                    <StatusIcon size={24} color={config.color} />
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
@@ -486,11 +288,12 @@ function Announcements() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '13px', color: '#999' }}>
                       <span style={{ fontWeight: '600' }}>{announcement.author}</span>
                       <span>•</span>
-                      <span>{announcement.createdAt?.toDate().toLocaleDateString()}</span>
+                      <span>{firestoreService.timeAgo(announcement.createdAt)}</span>
                     </div>
                   </div>
                 </div>
 
+                {/* Message */}
                 <p style={{
                   fontSize: '15px',
                   lineHeight: '1.7',
@@ -503,9 +306,226 @@ function Announcements() {
                 }}>
                   {announcement.message}
                 </p>
+
+                {/* Footer */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginLeft: '64px',
+                  paddingTop: '16px',
+                  borderTop: '1px solid #f0f0f0'
+                }}>
+                  <div style={{ fontSize: '13px', color: '#666', fontWeight: '500' }}>
+                    {announcement.readBy?.length || 0} people read
+                  </div>
+                  {!hasRead && (
+                    <button 
+                      onClick={() => handleMarkAsRead(announcement.id)}
+                      style={{
+                        padding: '8px 16px',
+                        background: config.bg,
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: config.color,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Mark as Read
+                    </button>
+                  )}
+                </div>
               </div>
             );
-          })}
+          })
+        )}
+      </div>
+
+      {/* Add Announcement Modal */}
+      {showAddModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}
+        onClick={() => setShowAddModal(false)}
+        >
+          <div 
+            style={{
+              background: 'white',
+              borderRadius: '24px',
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '28px 32px',
+              borderBottom: '1px solid #f0f0f0',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ fontSize: '24px', fontWeight: '700' }}>
+                New Announcement
+              </h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: '#f5f5f5',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: '32px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Type Selection */}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                    Type
+                  </label>
+                  <select 
+                    value={newAnnouncement.type}
+                    onChange={(e) => setNewAnnouncement({...newAnnouncement, type: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      border: '2px solid #f0f0f0',
+                      borderRadius: '12px',
+                      fontSize: '15px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {Object.entries(typeConfig).map(([key, config]) => (
+                      <option key={key} value={key}>{config.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Title */}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter announcement title..."
+                    value={newAnnouncement.title}
+                    onChange={(e) => setNewAnnouncement({...newAnnouncement, title: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      border: '2px solid #f0f0f0',
+                      borderRadius: '12px',
+                      fontSize: '15px'
+                    }}
+                  />
+                </div>
+
+                {/* Message */}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '600' }}>
+                    Message
+                  </label>
+                  <textarea
+                    placeholder="Enter announcement message..."
+                    value={newAnnouncement.message}
+                    onChange={(e) => setNewAnnouncement({...newAnnouncement, message: e.target.value})}
+                    rows="6"
+                    style={{
+                      width: '100%',
+                      padding: '14px',
+                      border: '2px solid #f0f0f0',
+                      borderRadius: '12px',
+                      fontSize: '15px',
+                      fontFamily: 'inherit',
+                      resize: 'vertical'
+                    }}
+                  />
+                </div>
+
+                {/* Pin Option */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <input
+                    type="checkbox"
+                    id="pinCheckbox"
+                    checked={newAnnouncement.isPinned}
+                    onChange={(e) => setNewAnnouncement({...newAnnouncement, isPinned: e.target.checked})}
+                    style={{ width: '20px', height: '20px', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="pinCheckbox" style={{ fontSize: '14px', fontWeight: '600', cursor: 'pointer' }}>
+                    Pin this announcement
+                  </label>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{ display: 'flex', gap: '12px', marginTop: '32px' }}>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  style={{
+                    flex: 1,
+                    padding: '14px',
+                    background: '#f5f5f5',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    color: '#666'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleCreateAnnouncement}
+                  style={{
+                    flex: 1,
+                    padding: '14px',
+                    background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    color: 'white',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <Plus size={18} />
+                  Create Announcement
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

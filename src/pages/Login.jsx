@@ -1,35 +1,47 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider 
-} from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
+import {
+  registerUser,
+  loginUser,
+  resetPassword,
+  resendVerificationEmail
+} from '../utils/authUtils';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [isSignup, setIsSignup] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already logged in
-  if (currentUser) {
+  if (currentUser && !needsVerification) {
     navigate('/');
     return null;
   }
 
+  // Handle Email/Password Authentication
   const handleEmailAuth = async (e) => {
     e.preventDefault();
     
+    // Validation
     if (!email || !password) {
       setError('Please fill in all fields');
+      return;
+    }
+
+    if (isSignup && !displayName) {
+      setError('Please enter your full name');
       return;
     }
 
@@ -40,42 +52,74 @@ function Login() {
 
     try {
       setError('');
+      setSuccess('');
       setLoading(true);
       
       if (isSignup) {
-        await createUserWithEmailAndPassword(auth, email, password);
+        // Sign up
+        const result = await registerUser(email, password, displayName);
+        setSuccess(result.message);
+        setNeedsVerification(true);
       } else {
-        await signInWithEmailAndPassword(auth, email, password);
+        // Sign in
+        const result = await loginUser(email, password);
+        
+        if (result.needsVerification) {
+          setNeedsVerification(true);
+          setSuccess('Please verify your email before accessing the app.');
+        } else {
+          navigate('/');
+        }
       }
       
-      navigate('/');
     } catch (err) {
       console.error('Auth error:', err);
-      if (err.code === 'auth/email-already-in-use') {
-        setError('Email already in use');
-      } else if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-        setError('Invalid email or password');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Invalid email address');
-      } else if (err.code === 'auth/invalid-credential') {
-        setError('Invalid credentials. Please check your email and password.');
-      } else {
-        setError('Failed to ' + (isSignup ? 'sign up' : 'login') + '. Please try again.');
-      }
+      setError(err.message || 'Authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle Password Reset
+  const handlePasswordReset = async (e) => {
+    e.preventDefault();
+
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+
+    try {
+      setError('');
+      setSuccess('');
+      setLoading(true);
+
+      const result = await resetPassword(email);
+      setSuccess(result.message);
+      setIsForgotPassword(false);
+
+    } catch (err) {
+      console.error('Password reset error:', err);
+      setError(err.message || 'Failed to send reset email. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Google Sign-In
   const handleGoogleSignIn = async () => {
     try {
       setError('');
+      setSuccess('');
       setLoading(true);
+
       const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       navigate('/');
+
     } catch (err) {
       console.error('Google sign-in error:', err);
+      
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Sign-in cancelled');
       } else {
@@ -86,6 +130,113 @@ function Login() {
     }
   };
 
+  // Resend Verification Email
+  const handleResendVerification = async () => {
+    try {
+      setError('');
+      setSuccess('');
+      setLoading(true);
+
+      const result = await resendVerificationEmail();
+      setSuccess(result.message);
+
+    } catch (err) {
+      console.error('Resend verification error:', err);
+      setError(err.message || 'Failed to resend verification email.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Render Forgot Password Form
+  if (isForgotPassword) {
+    return (
+      <div className="login-container">
+        <div className="login-box">
+          <div className="login-header">
+            <h1>🔐 Reset Password</h1>
+            <p>Enter your email to receive a password reset link</p>
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
+
+          <form onSubmit={handlePasswordReset}>
+            <div className="form-group">
+              <label>Email</label>
+              <input
+                type="email"
+                placeholder="your.email@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                autoComplete="email"
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Sending...' : 'Send Reset Link'}
+            </button>
+          </form>
+
+          <div className="login-footer">
+            <button onClick={() => {
+              setIsForgotPassword(false);
+              setError('');
+              setSuccess('');
+            }} disabled={loading}>
+              ← Back to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Email Verification Notice
+  if (needsVerification) {
+    return (
+      <div className="login-container">
+        <div className="login-box">
+          <div className="login-header">
+            <h1>📧 Verify Your Email</h1>
+            <p>We've sent a verification link to <strong>{email}</strong></p>
+          </div>
+
+          {success && <div className="success-message">{success}</div>}
+          {error && <div className="error-message">{error}</div>}
+
+          <div className="verification-info">
+            <p>Please check your email and click the verification link to activate your account.</p>
+            <p style={{ marginTop: '12px', fontSize: '14px', color: '#666' }}>
+              Didn't receive the email? Check your spam folder or click the button below to resend.
+            </p>
+          </div>
+
+          <button 
+            onClick={handleResendVerification} 
+            className="btn btn-primary"
+            disabled={loading}
+            style={{ marginTop: '20px' }}
+          >
+            {loading ? 'Sending...' : 'Resend Verification Email'}
+          </button>
+
+          <div className="login-footer" style={{ marginTop: '20px' }}>
+            Already verified?{' '}
+            <button onClick={() => {
+              setNeedsVerification(false);
+              navigate('/');
+            }} disabled={loading}>
+              Continue to App
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Main Login/Signup Form
   return (
     <div className="login-container">
       <div className="login-box">
@@ -95,6 +246,7 @@ function Login() {
         </div>
 
         {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
 
         {/* Google Sign-In Button */}
         <button 
@@ -118,6 +270,20 @@ function Login() {
 
         {/* Email/Password Form */}
         <form onSubmit={handleEmailAuth}>
+          {isSignup && (
+            <div className="form-group">
+              <label>Full Name</label>
+              <input
+                type="text"
+                placeholder="John Doe"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                disabled={loading}
+                autoComplete="name"
+              />
+            </div>
+          )}
+
           <div className="form-group">
             <label>Email</label>
             <input
@@ -138,9 +304,25 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
-              autoComplete="current-password"
+              autoComplete={isSignup ? 'new-password' : 'current-password'}
             />
           </div>
+
+          {!isSignup && (
+            <div className="forgot-password">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotPassword(true);
+                  setError('');
+                  setSuccess('');
+                }}
+                disabled={loading}
+              >
+                Forgot Password?
+              </button>
+            </div>
+          )}
 
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? 'Processing...' : (isSignup ? 'Sign Up' : 'Sign In')}
@@ -153,6 +335,7 @@ function Login() {
           <button onClick={() => {
             setIsSignup(!isSignup);
             setError('');
+            setSuccess('');
           }} disabled={loading}>
             {isSignup ? 'Sign In' : 'Sign Up'}
           </button>
